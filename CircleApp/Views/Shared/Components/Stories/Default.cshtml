@@ -1,0 +1,56 @@
+﻿@model List<Story>
+
+<div class="mb-8">
+    <h3 class="font-extrabold text-2xl text-black hidden">Stories</h3>
+
+    @* SỬA LỖI 1: Bỏ uk-lightbox="" ở dòng dưới này đi để nó không bắt nhầm sự kiện của mũi tên *@
+    <div class="relative" tabindex="-1" uk-slider="autoplay: true; finite: true">
+
+        <div class="pb-5 pt-0 uk-slider-container">
+            @* SỬA LỖI 2: Chuyển uk-lightbox="" xuống thẻ ul này. Chỉ những ảnh Story bên trong mới được bật popup xem ảnh đen *@
+            <ul class="uk-slider-items w-[calc(100%+14px)]" uk-lightbox="" uk-scrollspy="target:>li; cls:uk-animation-scale-up; delay:20; repeat:true">
+
+                <li class="md:pr-3" uk-scrollspy-class="uk-animation-fade">
+                    <div class="md:w-16 md:h-16 w-12 h-12 rounded-full relative border-2 border-dashed grid place-items-center bg-slate-200 border-slate-300 shrink-0"
+                         uk-toggle="target:#create-story">
+                        <ion-icon name="camera" class="text-2xl"></ion-icon>
+                    </div>
+                </li>
+
+                @foreach (var story in Model)
+                {
+                    var avatarUrl = string.IsNullOrEmpty(story.User?.ProfilePictureUrl)
+                    ? Url.Content("~/images/avatar/user.png")
+                    : Url.Content("~/" + story.User.ProfilePictureUrl);
+
+                    <li class="md:pr-3 pr-2 hover:scale-[1.15] hover:-rotate-2 duration-300">
+                        <a href="@story.ImageUrl" class="block">
+                            <div class="md:w-16 md:h-16 w-12 h-12 relative md:border-4 border-2 shadow border-white rounded-full overflow-hidden bg-slate-200">
+                                <img src="@avatarUrl" class="w-full h-full object-cover" alt="@story.User?.FullName" />
+                            </div>
+                        </a>
+                    </li>
+                }
+
+                <li class="md:pr-3 pr-2">
+                    <div class="md:w-16 md:h-16 w-12 h-12 bg-slate-200/60 rounded-full animate-pulse"></div>
+                </li>
+            </ul>
+        </div>
+
+        @* SỬA LỖI 3: Dùng thẻ <button> thay cho <a> để chống giật trang và chống dính lỗi lightbox *@
+
+        @* Nút TRÁI *@
+        <button type="button" class="absolute flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md z-50 top-8 -translate-y-1/2 -left-4"
+                uk-slider-item="previous">
+            <ion-icon name="chevron-back-outline" class="text-xl text-black"></ion-icon>
+        </button>
+
+        @* Nút PHẢI *@
+        <button type="button" class="absolute flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md z-50 top-8 -translate-y-1/2 -right-4"
+                uk-slider-item="next">
+            <ion-icon name="chevron-forward-outline" class="text-xl text-black"></ion-icon>
+        </button>
+
+    </div>
+</div>

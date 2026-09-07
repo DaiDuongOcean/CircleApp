@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircleApp", "CircleApp\CircleApp.csproj", "{C2D14E25-8027-44DA-912F-EFAC8E155200}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircleApp.Data", "CircleApp.Data\CircleApp.Data.csproj", "{AE40FD66-DC85-4105-BB14-B82A9B9DC71F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C2D14E25-8027-44DA-912F-EFAC8E155200}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2D14E25-8027-44DA-912F-EFAC8E155200}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2D14E25-8027-44DA-912F-EFAC8E155200}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE40FD66-DC85-4105-BB14-B82A9B9DC71F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE40FD66-DC85-4105-BB14-B82A9B9DC71F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE40FD66-DC85-4105-BB14-B82A9B9DC71F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE40FD66-DC85-4105-BB14-B82A9B9DC71F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

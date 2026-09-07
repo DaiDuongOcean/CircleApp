@@ -1,9 +1,38 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>153de37d-4f32-4d23-8793-190e2e26b33b</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\images\icons\placeholders\**" />
+    <Content Remove="wwwroot\images\icons\placeholders\**" />
+    <EmbeddedResource Remove="wwwroot\images\icons\placeholders\**" />
+    <None Remove="wwwroot\images\icons\placeholders\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CircleApp.Data\CircleApp.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Shared\Sidebar\" />
+  </ItemGroup>
 
 </Project>

@@ -1,0 +1,74 @@
+﻿@model List<Notification>
+@foreach (var notification in @Model)
+{
+    TimeSpan time = DateTime.UtcNow.Subtract(notification.DateCreated);
+    string displayTxt = time switch
+    {
+        var t when t.TotalDays >= 1 => $"{(int)t.TotalDays}d ago",
+        var t when t.TotalHours >= 1 => $"{(int)t.TotalHours}h ago",
+        var t when t.TotalMinutes >= 1 => $"{(int)t.TotalMinutes}m ago",
+        _ => "Just now"
+    };
+    string iconName = notification.Type switch
+    {
+        NotificationType.Favorite => "bookmark-outline",
+        NotificationType.Like => "heart-outline",
+        NotificationType.Comment => "chatbubbles-outline",
+        NotificationType.FriendRequest => "person-add-outline",
+        NotificationType.FriendRequestApproved => "person-outline",
+        _ => "notifications-outline"
+    };
+    (string bgColor, string iconColor) iconColors = notification.Type switch
+    {
+        NotificationType.Favorite => ("#fef3c7", "#d97706"),
+        NotificationType.Like => ("#fee2e2", "#dc2626"),
+        NotificationType.Comment => ("#dbeafe", "#2563eb"),
+        NotificationType.FriendRequest => ("#dcfce7", "#16a34a"),
+        NotificationType.FriendRequestApproved => ("#e0e7ff", "#4f46e5"),
+        _ => ("#f3f4f6", "#6b7280")
+    };
+    string redirectUrl = notification.Type switch
+    {
+        NotificationType.FriendRequest => Url.Action("Index", "Friends"),
+        NotificationType.FriendRequestApproved => Url.Action("Index", "Friends"),
+        _ => Url.Action("Details", "Home", new { postId = notification.PostId })
+    };
+
+    // MỚI: nền của từng thẻ - đậm hơn hẳn khi chưa đọc, trắng tinh khi đã đọc
+    string cardBg = notification.IsRead
+        ? "background-color:#ffffff;"
+        : "background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%);";
+
+    <div class="relative flex items-start gap-3 p-3 pr-12 mb-2.5 rounded-xl transition-all duration-200 hover:shadow-lg"
+         style="@cardBg border:1px solid @(notification.IsRead ? "#f1f5f9" : "#a7f3d0"); box-shadow: 0 1px 3px 0 rgba(60,64,67,0.15), 0 1px 2px 0 rgba(60,64,67,0.1);">
+        <div class="flex items-start gap-3 flex-1 min-w-0">
+            <div class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+                 style="background-color:@iconColors.bgColor;">
+                <ion-icon name="@iconName" class="text-lg" style="color:@iconColors.iconColor;"></ion-icon>
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="break-words">
+                    <a href="@redirectUrl">
+                        @if (notification.IsRead)
+                        {
+                            @notification.Message
+                        }
+                        else
+                        {
+                            <b class="font-bold mr1">
+                                @notification.Message
+                            </b>
+                        }
+                    </a>
+                </p>
+                <div class="text-xs text-gray-500 mt-1.5">@displayTxt</div>
+            </div>
+        </div>
+        @if (notification.IsRead == false)
+        {
+            <div class="w-2.5 h-2.5 bg-teal-600 rounded-full absolute cursor-pointer"
+                 style="right:12px; top:12px;"
+                 onclick="setNotificationAsRead(@notification.Id)"></div>
+        }
+    </div>
+}
