@@ -6,8 +6,24 @@ using CircleApp.Data.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Support dynamic port injected by Railway ($PORT)
+var envPort = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(envPort))
+{
+    builder.WebHost.UseUrls($"http://+:{envPort}");
+}
+
+// Forwarded Headers for reverse proxy (Railway, Render, etc.)
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -72,14 +88,40 @@ var app = builder.Build();
 // Seed the database with initial data
 using (var scope = app.Services.CreateScope())
 {
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await dbContext.Database.MigrateAsync();
-    await DbInitializer.SeedAsync(dbContext);
 
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-    await DbInitializer.SeedUsersAndRolesAsync(userManager, roleManager);
+    int retries = 10;
+    while (retries > 0)
+    {
+        try
+        {
+            logger.LogInformation("Checking and migrating database...");
+            await dbContext.Database.MigrateAsync();
+            await DbInitializer.SeedAsync(dbContext);
+
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+            await DbInitializer.SeedUsersAndRolesAsync(userManager, roleManager);
+            logger.LogInformation("Database migration and seeding completed successfully.");
+            break;
+        }
+        catch (Exception ex)
+        {
+            retries--;
+            logger.LogWarning(ex, "Database connection not ready yet. Retrying in 5 seconds... ({Remaining} retries left)", retries);
+            if (retries == 0)
+            {
+                logger.LogError(ex, "Could not connect to database after maximum retries.");
+                throw;
+            }
+            await Task.Delay(5000);
+        }
+    }
 }
+
+// Forwarded headers for Railway/reverse proxy
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
