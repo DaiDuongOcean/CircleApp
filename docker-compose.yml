@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: circleapp-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:-YourStrong@Password123}
+    ports:
+      - "14333:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P '${MSSQL_SA_PASSWORD:-YourStrong@Password123}' -C -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: circleapp-web
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Server=db,1433;Database=CircleAppDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-YourStrong@Password123};TrustServerCertificate=True;MultipleActiveResultSets=true;
+      - Auth__Google__ClientId=${AUTH_GOOGLE_CLIENT_ID}
+      - Auth__Google__ClientSecret=${AUTH_GOOGLE_CLIENT_SECRET}
+      - Auth__GitHub__ClientId=${AUTH_GITHUB_CLIENT_ID}
+      - Auth__GitHub__ClientSecret=${AUTH_GITHUB_CLIENT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - circleapp-images:/app/wwwroot/images
+    restart: unless-stopped
+
+volumes:
+  mssql-data:
+    driver: local
+  circleapp-images:
+    driver: local
