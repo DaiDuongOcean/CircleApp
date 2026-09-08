@@ -1,4 +1,4 @@
-﻿using CircleApp.Data.Dtos;
+using CircleApp.Data.Dtos;
 using CircleApp.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,7 @@ namespace CircleApp.Data.Services
         Task SendRequestAsync(int senderId, int receiverId);
         Task<FriendRequest> UpdateRequestAsync(int requestId, string status);
         Task RemoveFriendAsync(int friendshipId);
+        Task RemoveFriendshipBetweenUsersAsync(int userId1, int userId2);
         Task<List<UserWithFriendsCountDto>> GetSuggestedFriendsAsync(int userId);
         Task<List<FriendRequest>> GetSentFriendRequestAsync(int userId);
         Task<List<FriendRequest>> GetReceivedFriendRequestAsync(int userId);

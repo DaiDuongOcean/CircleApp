@@ -17,7 +17,7 @@
                 <div class="space-y-2">
                     @foreach (var item in Model.Friends)
                     {
-                        <a asp-controller="Friends" asp-action="Profile" asp-route-id="@item.User.Id"
+                        <a asp-controller="Users" asp-action="Details" asp-route-userId="@item.User.Id"
                            class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondery">
                             <img src="@(string.IsNullOrEmpty(item.User.ProfilePictureUrl) ? Url.Content("~/images/avatar/user.png") : Url.Content("~/" + item.User.ProfilePictureUrl))"
                                  class="w-10 h-10 rounded-full object-cover shrink-0" />

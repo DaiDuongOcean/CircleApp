@@ -1,11 +1,21 @@
 ﻿@model Post
-
 <main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
-    <div class="w-full h-full" id="js-oversized">
-        <div class="w-full h-full">
-            
-            <partial name="Home/_Post" model="Model" view-data='new ViewDataDictionary(ViewData){{ "ShowAllComments", true}}'></partial>
-            
+    <div class="lg:flex 2xl:gap-16 gap-12 max-w-[1065px] mx-auto" id="js-oversized">
+        <div class="max-w-[680px] mx-auto w-full">
+            <div class="md:max-w-[580px] mx-auto flex-1 xl:space-y-6 space-y-3">
+                <partial name="Home/_Post" model="Model" view-data='new ViewDataDictionary(ViewData) { { "ShowAllComments", true } }'></partial>
+            </div>
+        </div>
+        <div class="flex-1">
+            <div class="lg:space-y-4 lg:pb-8 max-lg:grid sm:grid-cols-2 max-lg:gap-6">
+                <div class="box p-5 px-6">
+                    @await Component.InvokeAsync("SuggestedFriends")
+                </div>
+
+                <div class="box p-5 px-6 border1">
+                    @await Component.InvokeAsync("Hashtags")
+                </div>
+            </div>
         </div>
     </div>
 </main>

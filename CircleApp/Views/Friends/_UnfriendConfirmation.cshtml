@@ -1,0 +1,26 @@
+<div id="unfriendDialog" uk-modal>
+    <div class="uk-modal-dialog relative mx-auto bg-white rounded-lg shadow-xl w-[400px]">
+        <div class="p-6">
+            <h2 class="text-xl font-semibold">Hủy kết bạn</h2>
+        </div>
+        <div class="p-6 py-0">
+            <p>Bạn có chắc muốn hủy kết bạn với người này không?</p>
+        </div>
+
+        <div class="flex justify-end items-center gap-2 p-6 text-sm font-medium">
+            <button type="button" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md uk-modal-close transition-colors">Hủy bỏ</button>
+            <form asp-controller="Friends" asp-action="RemoveFriend" method="post" class="inline m-0">
+                <input type="hidden" name="friendshipId" id="unfriendFriendshipId" value="" />
+                <input type="hidden" name="targetUserId" id="unfriendTargetUserId" value="" />
+                <input type="hidden" name="returnUrl" id="unfriendReturnUrl" value="" />
+                <button type="submit" class="px-5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-medium">Xác nhận</button>
+            </form>
+        </div>
+
+        <button type="button" class="bg-white rounded-full p-2 absolute right-0 top-0 m-3 uk-modal-close">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+</div>

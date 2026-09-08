@@ -1,4 +1,4 @@
-﻿using CircleApp.Controllers.Base;
+using CircleApp.Controllers.Base;
 using CircleApp.Data.Helpers.Constants;
 using CircleApp.Data.Services;
 using CircleApp.ViewModels.Friends;
@@ -114,9 +114,18 @@ namespace CircleApp.Controllers
         //    return RedirectToAction("Index");
         //}
         [HttpPost]
-        public async Task<IActionResult> RemoveFriend(int friendshipId, string returnUrl = null)
+        public async Task<IActionResult> RemoveFriend(int friendshipId, int? targetUserId = null, string returnUrl = null)
         {
-            await _friendsService.RemoveFriendAsync(friendshipId);
+            if (friendshipId > 0)
+            {
+                await _friendsService.RemoveFriendAsync(friendshipId);
+            }
+
+            var currentUserId = GetUserId();
+            if (currentUserId.HasValue && targetUserId.HasValue && targetUserId.Value > 0)
+            {
+                await _friendsService.RemoveFriendshipBetweenUsersAsync(currentUserId.Value, targetUserId.Value);
+            }
 
             if (!string.IsNullOrEmpty(returnUrl)) return Redirect(returnUrl);
             return RedirectToAction("Index");

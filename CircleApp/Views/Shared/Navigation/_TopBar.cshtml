@@ -4,7 +4,7 @@
     var userName = loggedInUser?.UserName;
     var fullName = loggedInUser?.FullName;
     var profilePictureUrl = loggedInUser?.ProfilePictureUrl;
-    var isAdmin = User.IsInRole(AppRoles.Admin); // sửa lại đúng tên hằng role của bạn
+    var isAdmin = User.IsInRole(AppRoles.Admin);
 }
 
 <header class="z-[100] h-[--m-top] fixed top-0 left-0 w-full flex items-center bg-white/80 sky-50 backdrop-blur-xl border-b border-slate-200">
@@ -29,16 +29,25 @@
     </div>
 
     <div class="flex-1 relative">
-        @if (!isAdmin)
-        {
-            <div class="max-w-[1220px] mx-auto flex items-center">
+        
+        <div class="lg:flex 2xl:gap-16 gap-12 max-w-[1065px] mx-auto h-full items-center max-sm:hidden">
+            <div class="max-w-[680px] mx-auto w-full flex justify-center">
                 <form id="search--box" asp-controller="Home" asp-action="Search" method="get"
-                      class="xl:w-[680px] sm:w-96 sm:relative rounded-xl overflow-hidden z-20 bg-secondery max-md:hidden w-screen left-0 max-sm:fixed max-sm:top-2">
+                      class="xl:w-[680px] sm:w-96 sm:relative rounded-xl overflow-hidden z-20 bg-secondery">
                     <ion-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2"></ion-icon>
                     <input type="text" name="query" placeholder="Search Posts, Friends..." class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm" />
                 </form>
             </div>
-        }
+            <div class="flex-1"></div>
+        </div>
+
+        @* Giữ riêng phiên bản mobile *@
+        <form asp-controller="Home" asp-action="Search" method="get"
+              class="hidden max-sm:block fixed top-2 left-0 w-screen z-20 bg-secondery rounded-xl overflow-hidden">
+            <ion-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2"></ion-icon>
+            <input type="text" name="query" placeholder="Search Posts, Friends..." class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm" />
+        </form>
+        
 
         <div class="max-w-[1220px] mx-auto flex items-center">
             <div class="flex items-center sm:gap-4 gap-2 absolute right-5 top-1/2 -translate-y-1/2 text-black">
@@ -139,7 +148,7 @@
             .then(() => console.log("SignalR connected"))
             .catch((err) => console.log("SignalR connection error: ", err));
 
-            // MỚI: badge tin nhắn chưa đọc, cập nhật realtime trên MỌI trang
+            
         fetch("/Chats/GetUnreadCount")
             .then(r => r.json())
             .then(count => updateMessageBadge(count))

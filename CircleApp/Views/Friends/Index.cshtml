@@ -1,4 +1,4 @@
-﻿﻿@using System.Security.Claims;
+@using System.Security.Claims;
 @model FriendshipVM;
 
 <main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
@@ -32,12 +32,10 @@
                             <a asp-controller="Users" asp-action="Details" asp-route-userId="@friend.Id" class="text-base font-semibold capitalize text-black">@friend.FullName</a>
                         </div>
 
-                        <form asp-controller="Friends" asp-action="RemoveFriend" method="post">
-                            <input type="hidden" name="friendshipId" value="@_friendship.Id" />
-                            <button type="submit" class="button bg-red-soft text-red gap-1 max-md:hidden">
-                                <ion-icon name="remove-circle-outline" class="text-xl -ml-1"></ion-icon> Remove
-                            </button>
-                        </form>
+                        @* SỬA: dùng nút mở modal xác nhận, thay vì submit ngay *@
+                        <button type="button" onclick="openUnfriendConfirmation('@_friendship.Id', '@friend.Id', '')" class="button bg-red-soft text-red gap-1 max-md:hidden">
+                            <ion-icon name="remove-circle-outline" class="text-xl -ml-1"></ion-icon> Remove
+                        </button>
                     </div>
                 }
             </div>
@@ -59,7 +57,7 @@
 
                         <div class="w-14 h-14 flex-shrink-0 rounded-lg relative">
                             <img src="@(string.IsNullOrEmpty(request.Sender.ProfilePictureUrl) ? Url.Content("~/images/avatar/user.png") :
-                                                                                       request.Sender.ProfilePictureUrl)"
+                                                                                                                        request.Sender.ProfilePictureUrl)"
                          class="absolute w-full h-full inset-0 rounded-md object-cover shadow-sm" />
                 </div>
 
@@ -75,7 +73,7 @@
                             </button>
                         </form>
 
-                        
+
                         <form asp-controller="Friends" asp-action="UpdateFriendRequest" method="post">
                             <input type="hidden" name="requestId" value="@request.Id" />
                             <input type="hidden" name="status" value="@FriendshipStatus.Accepted" />
@@ -105,7 +103,7 @@
 
                         <div class="w-14 h-14 flex-shrink-0 rounded-lg relative">
                             <img src="@(string.IsNullOrEmpty(request.Receiver.ProfilePictureUrl) ? Url.Content("~/images/avatar/user.png") :
-                                                             request.Receiver.ProfilePictureUrl)"
+                                                                                              request.Receiver.ProfilePictureUrl)"
                          class="absolute w-full h-full inset-0 rounded-md object-cover shadow-sm" />
                 </div>
 
@@ -113,6 +111,7 @@
                             <a asp-controller="Users" asp-action="Details" asp-route-userId="@request.Receiver.Id" class="text-base font-semibold capitalize text-black">@request.Receiver.FullName</a>
                         </div>
 
+                        @* KHÔI PHỤC: giữ nguyên như code gốc - form Cancel, không cần modal xác nhận vì đây chỉ là hủy lời mời đang chờ *@
                         <form asp-controller="Friends" asp-action="UpdateFriendRequest" method="post">
                             <input type="hidden" name="requestId" value="@request.Id" />
                             <input type="hidden" name="status" value="@FriendshipStatus.Canceled" />
@@ -128,3 +127,14 @@
 
     </div>
 </main>
+<partial name="~/Views/Friends/_UnfriendConfirmation.cshtml"></partial>
+
+<script>
+    function openUnfriendConfirmation(friendshipId, targetUserId, returnUrl) {
+        document.getElementById('unfriendFriendshipId').value = friendshipId || '';
+        var targetInput = document.getElementById('unfriendTargetUserId');
+        if (targetInput) targetInput.value = targetUserId || '';
+        document.getElementById('unfriendReturnUrl').value = returnUrl || '';
+        UIkit.modal('#unfriendDialog').show();
+    }
+</script>

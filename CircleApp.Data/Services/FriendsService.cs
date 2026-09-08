@@ -1,4 +1,4 @@
-﻿using CircleApp.Data.Dtos;
+using CircleApp.Data.Dtos;
 using CircleApp.Data.Helpers.Constants;
 using CircleApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -92,21 +92,54 @@ namespace CircleApp.Data.Services
             var friendship = await _context.Friendships.FirstOrDefaultAsync(fr => fr.Id == friendshipId);
             if (friendship != null)
             {
-                _context.Friendships.Remove(friendship);
-                await _context.SaveChangesAsync();
+                var senderId = friendship.SenderId;
+                var receiverId = friendship.ReceiverId;
+
+                var friendships = await _context.Friendships
+                    .Where(f => (f.SenderId == senderId && f.ReceiverId == receiverId) ||
+                                (f.SenderId == receiverId && f.ReceiverId == senderId))
+                    .ToListAsync();
+
+                _context.Friendships.RemoveRange(friendships);
 
                 //find requests
                 var requests = await _context.FriendRequests
-                    .Where(r => (r.SenderId == friendship.SenderId && r.ReceiverId == friendship.ReceiverId) ||
-                    (r.SenderId == friendship.ReceiverId && r.ReceiverId == friendship.SenderId))
+                    .Where(r => (r.SenderId == senderId && r.ReceiverId == receiverId) ||
+                    (r.SenderId == receiverId && r.ReceiverId == senderId))
                     .ToListAsync();
 
                 if (requests.Any())
                 {
                     _context.FriendRequests.RemoveRange(requests);
-                    await _context.SaveChangesAsync();
                 }
+
+                await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task RemoveFriendshipBetweenUsersAsync(int userId1, int userId2)
+        {
+            var friendships = await _context.Friendships
+                .Where(f => (f.SenderId == userId1 && f.ReceiverId == userId2) ||
+                            (f.SenderId == userId2 && f.ReceiverId == userId1))
+                .ToListAsync();
+
+            if (friendships.Any())
+            {
+                _context.Friendships.RemoveRange(friendships);
+            }
+
+            var requests = await _context.FriendRequests
+                .Where(r => (r.SenderId == userId1 && r.ReceiverId == userId2) ||
+                            (r.SenderId == userId2 && r.ReceiverId == userId1))
+                .ToListAsync();
+
+            if (requests.Any())
+            {
+                _context.FriendRequests.RemoveRange(requests);
+            }
+
+            await _context.SaveChangesAsync();
         }
         public async Task<List<FriendRequest>> GetSentFriendRequestAsync(int userId)
         {

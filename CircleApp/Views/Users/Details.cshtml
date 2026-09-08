@@ -1,4 +1,4 @@
-﻿@using CircleApp.Data.Helpers.Constants
+@using CircleApp.Data.Helpers.Constants
 @model GetUserProfileVM
 
 <main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
@@ -21,7 +21,7 @@
                     <h3 class="md:text-3xl text-base font-bold text-black">@Model.User.FullName</h3>
                     <p class="mt-2 text-gray-500">@Model.User.UserName</p>
 
-                    @* MỚI: nút kết bạn + nhắn tin *@
+                    @* nút kết bạn + nhắn tin *@
                     @if (Model.RelationshipStatus != "Self")
                     {
                         var currentPath = Context.Request.Path + Context.Request.QueryString;
@@ -30,13 +30,17 @@
 
                             @if (Model.RelationshipStatus == "Friends")
                             {
-                                <form asp-controller="Friends" asp-action="RemoveFriend" method="post">
-                                    <input type="hidden" name="friendshipId" value="@Model.FriendshipId" />
-                                    <input type="hidden" name="returnUrl" value="@currentPath" />
-                                    <button type="submit" class="button bg-gray-100 text-black gap-1">
+                                <button type="button"
+                                        onclick="openUnfriendConfirmation('@Model.FriendshipId', '@Model.User.Id', '@currentPath')"
+                                        class="button bg-gray-100 text-black gap-1 group hover:bg-red-50 hover:text-red-600 transition-colors"
+                                        style="min-width: 130px;">
+                                    <span class="group-hover:hidden flex items-center gap-1">
                                         <ion-icon name="people-outline" class="text-lg -ml-1"></ion-icon> Bạn bè
-                                    </button>
-                                </form>
+                                    </span>
+                                    <span class="hidden group-hover:flex items-center gap-1">
+                                        <ion-icon name="person-remove-outline" class="text-lg -ml-1"></ion-icon> Hủy kết bạn
+                                    </span>
+                                </button>
                             }
                             else if (Model.RelationshipStatus == "PendingSent")
                             {
@@ -146,6 +150,17 @@
 </main>
 
 <partial name="Home/_PostDeleteConfirmation"></partial>
+<partial name="~/Views/Friends/_UnfriendConfirmation.cshtml"></partial>
+
+<script>
+    function openUnfriendConfirmation(friendshipId, targetUserId, returnUrl) {
+        document.getElementById('unfriendFriendshipId').value = friendshipId || '';
+        var targetInput = document.getElementById('unfriendTargetUserId');
+        if (targetInput) targetInput.value = targetUserId || '';
+        document.getElementById('unfriendReturnUrl').value = returnUrl || '';
+        UIkit.modal('#unfriendDialog').show();
+    }
+</script>
 
 <script>
     function openPostDeleteConfirmation(postId){
