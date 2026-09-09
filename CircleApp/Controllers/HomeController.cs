@@ -7,6 +7,8 @@ using CircleApp.ViewModels.Home;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CircleApp.Controllers
 {
@@ -59,7 +61,7 @@ namespace CircleApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            
+
             var loggedInUserId = GetUserId();
             if (loggedInUserId == null)
                 return RedirectToLogin();
@@ -78,6 +80,7 @@ namespace CircleApp.Controllers
         public async Task<IActionResult> CreatePost(PostVM post)
         {
             var loggedInUserId = GetUserId();
+            var userName = GetUserFullName();
             if (loggedInUserId == null)
                 return RedirectToLogin();
 
@@ -93,10 +96,23 @@ namespace CircleApp.Controllers
                 UserId = loggedInUserId.Value,
             };
 
-            await _postsService.CreatePostAsync(newPost);
+            var createdPost = await _postsService.CreatePostAsync(newPost);
             await _hashtagsService.ProcessHashtagsForNewPostAsync(post.Content);
 
-            
+            // Thông báo cho bạn bè biết có bài viết mới (bỏ qua nếu bài viết ở chế độ riêng tư)
+            if (!createdPost.IsPrivate)
+            {
+                var friends = await _friendsService.GetFriendsAsync(loggedInUserId.Value);
+                var friendIds = friends
+                    .Select(f => f.SenderId == loggedInUserId.Value ? f.ReceiverId : f.SenderId)
+                    .Distinct();
+
+                foreach (var friendId in friendIds)
+                {
+                    await _notificationsService.AddNewNotificationAsync(friendId, NotificationType.NewPost, userName, createdPost.Id);
+                }
+            }
+
             return RedirectToAction("Index");
         }
 
@@ -154,10 +170,30 @@ namespace CircleApp.Controllers
 
             var post = await _postsService.GetPostByIdAsync(postCommentVM.PostId);
 
-            if (userId != post.UserId)
-                await _notificationsService.AddNewNotificationAsync(post.UserId, NotificationType.Comment, userName, postCommentVM.PostId);
+            // Thông báo cho chủ bài viết VÀ tất cả những ai từng bình luận/reply dưới bài viết này,
+            // trừ chính người vừa gửi bình luận. Dùng HashSet để không gửi trùng cho cùng 1 người.
+            var recipientIds = new HashSet<int> { post.UserId };
+            CollectCommenterIds(post.Comments, recipientIds);
+            recipientIds.Remove(userId.Value);
+
+            foreach (var recipientId in recipientIds)
+            {
+                await _notificationsService.AddNewNotificationAsync(recipientId, NotificationType.Comment, userName, postCommentVM.PostId);
+            }
 
             return PartialView("Home/_Post", post);
+        }
+
+        // Duyệt đệ quy toàn bộ comment + reply của 1 bài viết để lấy hết UserId đã từng bình luận
+        private void CollectCommenterIds(IEnumerable<Comment> comments, HashSet<int> recipientIds)
+        {
+            if (comments == null) return;
+
+            foreach (var comment in comments)
+            {
+                recipientIds.Add(comment.UserId);
+                CollectCommenterIds(comment.Replies, recipientIds);
+            }
         }
 
         [HttpPost]
@@ -196,7 +232,7 @@ namespace CircleApp.Controllers
             if (loggedInUserId == null)
                 return RedirectToLogin();
             await _postsService.TogglePostVisibilityAsync(postVisibilityVM.PostId, loggedInUserId.Value);
-            
+
             return RedirectToAction("Index");
         }
 

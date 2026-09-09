@@ -32,19 +32,6 @@ namespace CircleApp.Controllers
             return View(friendsData);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> SendFriendRequest(int receiverId)
-        //{
-        //    var userId = GetUserId();
-        //    var userName = GetUserFullName();
-        //    if (!userId.HasValue) RedirectToLogin();
-
-        //    await _friendsService.SendRequestAsync(userId.Value, receiverId);
-
-        //    await _notificationsService.AddNewNotificationAsync(receiverId, NotificationType.FriendRequest, userName, null);
-
-        //    return RedirectToAction("Index", "Home");
-        //}
         [HttpPost]
         public async Task<IActionResult> SendFriendRequest(int receiverId, string returnUrl = null)
         {
@@ -58,41 +45,6 @@ namespace CircleApp.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CancelFriendRequest(int requestId)
-        //{
-        //    await _friendsService.UpdateRequestAsync(requestId, FriendshipStatus.Canceled);
-        //    return RedirectToAction("Index");
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> AcceptFriendRequest(int requestId)
-        //{
-        //    await _friendsService.UpdateRequestAsync(requestId, FriendshipStatus.Accepted);
-        //    return RedirectToAction("Index");
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> RejectFriendRequest(int requestId)
-        //{
-        //    await _friendsService.UpdateRequestAsync(requestId, FriendshipStatus.Rejected);
-        //    return RedirectToAction("Index");
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateFriendRequest(int requestId, string status)
-        //{
-        //    var userId = GetUserId();
-        //    var userName = GetUserFullName();
-        //    if (!userId.HasValue) RedirectToLogin();
-
-        //     var request = await _friendsService.UpdateRequestAsync(requestId, status);
-
-        //    if (status == FriendshipStatus.Accepted)
-        //        await _notificationsService.AddNewNotificationAsync(request.SenderId, NotificationType.FriendRequestApproved, userName, null);
-
-        //    return RedirectToAction("Index");
-        //}
         [HttpPost]
         public async Task<IActionResult> UpdateFriendRequest(int requestId, string status, string returnUrl = null)
         {
@@ -107,12 +59,6 @@ namespace CircleApp.Controllers
             return RedirectToAction("Index");
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> RemoveFriend(int friendshipId)
-        //{
-        //    await _friendsService.RemoveFriendAsync(friendshipId);
-        //    return RedirectToAction("Index");
-        //}
         [HttpPost]
         public async Task<IActionResult> RemoveFriend(int friendshipId, int? targetUserId = null, string returnUrl = null)
         {

@@ -63,7 +63,7 @@ namespace CircleApp.Data.Services
         {
             var notificationDb = await _context.Notifications.FirstOrDefaultAsync(n => n.Id == notificationId);
 
-            if(notificationDb != null)
+            if (notificationDb != null)
             {
                 notificationDb.DateUpdated = DateTime.UtcNow;
                 notificationDb.IsRead = true;
@@ -76,7 +76,7 @@ namespace CircleApp.Data.Services
         private string GetPostMessage(string notificationType, string userFullName)
         {
             var message = "";
-            switch(notificationType)
+            switch (notificationType)
             {
                 case NotificationType.Like:
                     message = $"{userFullName} liked your post";
@@ -96,6 +96,10 @@ namespace CircleApp.Data.Services
 
                 case NotificationType.FriendRequestApproved:
                     message = $"{userFullName} approved your friendship request";
+                    break;
+
+                case NotificationType.NewPost:
+                    message = $"{userFullName} shared a new post";
                     break;
 
                 default:

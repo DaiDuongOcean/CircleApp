@@ -16,6 +16,7 @@
         NotificationType.Comment => "chatbubbles-outline",
         NotificationType.FriendRequest => "person-add-outline",
         NotificationType.FriendRequestApproved => "person-outline",
+        NotificationType.NewPost => "newspaper-outline",
         _ => "notifications-outline"
     };
     (string bgColor, string iconColor) iconColors = notification.Type switch
@@ -25,6 +26,7 @@
         NotificationType.Comment => ("#dbeafe", "#2563eb"),
         NotificationType.FriendRequest => ("#dcfce7", "#16a34a"),
         NotificationType.FriendRequestApproved => ("#e0e7ff", "#4f46e5"),
+        NotificationType.NewPost => ("#e0f2fe", "#0284c7"),
         _ => ("#f3f4f6", "#6b7280")
     };
     string redirectUrl = notification.Type switch
@@ -33,14 +35,15 @@
         NotificationType.FriendRequestApproved => Url.Action("Index", "Friends"),
         _ => Url.Action("Details", "Home", new { postId = notification.PostId })
     };
-
-    // MỚI: nền của từng thẻ - đậm hơn hẳn khi chưa đọc, trắng tinh khi đã đọc
     string cardBg = notification.IsRead
         ? "background-color:#ffffff;"
         : "background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%);";
+    string isReadJs = notification.IsRead ? "true" : "false";
 
-    <div class="relative flex items-start gap-3 p-3 pr-12 mb-2.5 rounded-xl transition-all duration-200 hover:shadow-lg"
-         style="@cardBg border:1px solid @(notification.IsRead ? "#f1f5f9" : "#a7f3d0"); box-shadow: 0 1px 3px 0 rgba(60,64,67,0.15), 0 1px 2px 0 rgba(60,64,67,0.1);">
+    <a href="@redirectUrl"
+       onclick="handleNotificationClick(event, @notification.Id, @isReadJs)"
+       class="relative flex items-start gap-3 p-3 pr-12 mb-2.5 rounded-xl transition-all duration-200 hover:shadow-lg cursor-pointer"
+       style="@cardBg border:1px solid @(notification.IsRead ? "#f1f5f9" : "#a7f3d0"); box-shadow: 0 1px 3px 0 rgba(60,64,67,0.15), 0 1px 2px 0 rgba(60,64,67,0.1);">
         <div class="flex items-start gap-3 flex-1 min-w-0">
             <div class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
                  style="background-color:@iconColors.bgColor;">
@@ -48,27 +51,23 @@
             </div>
             <div class="min-w-0 flex-1">
                 <p class="break-words">
-                    <a href="@redirectUrl">
-                        @if (notification.IsRead)
-                        {
+                    @if (notification.IsRead)
+                    {
+                        @notification.Message
+                    }
+                    else
+                    {
+                        <b class="font-bold mr1">
                             @notification.Message
-                        }
-                        else
-                        {
-                            <b class="font-bold mr1">
-                                @notification.Message
-                            </b>
-                        }
-                    </a>
+                        </b>
+                    }
                 </p>
                 <div class="text-xs text-gray-500 mt-1.5">@displayTxt</div>
             </div>
         </div>
         @if (notification.IsRead == false)
         {
-            <div class="w-2.5 h-2.5 bg-teal-600 rounded-full absolute cursor-pointer"
-                 style="right:12px; top:12px;"
-                 onclick="setNotificationAsRead(@notification.Id)"></div>
+            <div class="w-2.5 h-2.5 bg-teal-600 rounded-full absolute" style="right:12px; top:12px;"></div>
         }
-    </div>
+    </a>
 }

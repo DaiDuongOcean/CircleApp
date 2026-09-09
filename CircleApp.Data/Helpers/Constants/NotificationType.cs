@@ -13,5 +13,6 @@ namespace CircleApp.Data.Helpers.Constants
         public const string Favorite = "Favorite";
         public const string FriendRequest = "FriendRequest";
         public const string FriendRequestApproved = "FriendRequestApproved";
+        public const string NewPost = "NewPost";
     }
 }
